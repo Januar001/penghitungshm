@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Profit Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f1f1f1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            animation: fadeIn 1s ease-in-out;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin-top: 5px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: #4CAF50;
+        }
+
+        button {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        #myChart {
+            width: 100%;
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Stock Profit Calculator</h1>
+        <div class="form-group">
+            <label for="buyPrice">Buy Price (Rp):</label>
+            <input type="number" id="buyPrice" placeholder="Enter Buy Price">
+        </div>
+        <div class="form-group">
+            <label for="sellPrice">Sell Price (Rp):</label>
+            <input type="number" id="sellPrice" placeholder="Enter Sell Price">
+        </div>
+        <div class="form-group">
+            <label for="quantity">Quantity (Lot):</label>
+            <input type="number" id="quantity" placeholder="Enter Quantity in Lot">
+        </div>
+        <button onclick="calculateProfit()">Calculate Profit</button>
+        <div id="result"></div>
+    </div>
+
+    <canvas id="myChart"></canvas>
+
+    <script>
+        function calculateProfit() {
+            const buyPrice = parseFloat(document.getElementById('buyPrice').value);
+            const sellPrice = parseFloat(document.getElementById('sellPrice').value);
+            const quantity = parseInt(document.getElementById('quantity').value) * 100; // 1 Lot = 100 shares
+
+            if (isNaN(buyPrice) || isNaN(sellPrice) || isNaN(quantity)) {
+                document.getElementById('result').innerText = 'Please fill all fields!';
+                document.getElementById('result').style.opacity = 1;
+                return;
+            }
+
+            const profit = (sellPrice - buyPrice) * quantity;
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerText = `Your Profit is Rp ${profit.toLocaleString()}`;
+            resultDiv.style.opacity = 1;
+
+            // Draw chart
+            drawChart(buyPrice, sellPrice);
+        }
+
+        function drawChart(buyPrice, sellPrice) {
+            const ctx = document.getElementById('myChart').getContext('2d');
+
+            const chartData = {
+                labels: ['Buy Price', 'Sell Price'],
+                datasets: [
+                    {
+                        label: 'Buy Price',
+                        data: [buyPrice, buyPrice],
+                        fill: false,
+                        borderColor: 'blue',
+                        tension: 0.1
+                    },
+                    {
+                        label: 'Sell Price',
+                        data: [sellPrice, sellPrice],
+                        fill: false,
+                        borderColor: 'red',
+                        tension: 0.1
+                    }
+                ]
+            };
+
+            if (window.myChart instanceof Chart) {
+                window.myChart.destroy();
+            }
+
+            window.myChart = new Chart(ctx, {
+                type: 'line',
+                data: chartData,
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
